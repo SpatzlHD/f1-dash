@@ -10,6 +10,8 @@ import Button from "@/components/Button";
 import Toggle from "@/components/Toggle";
 import Footer from "@/components/Footer";
 import Note from "@/components/Note";
+import SegmentedControls from "@/components/SegmentedControls";
+import { SpeedPreference } from "@/context/SpeedPreferenceContext";
 
 export default function SettingsPage() {
 	const router = useRouter();
@@ -17,6 +19,9 @@ export default function SettingsPage() {
 	const [tableHeaders, setTableHeaders] = useState<boolean>(false);
 	const [sectorFastest, setSectorFastest] = useState<boolean>(false);
 	const [carMetrics, setCarMetrics] = useState<boolean>(false);
+	const [showCornerNumbers, setShowCornerNumbers] = useState<boolean>(false);
+
+	const [speedPreference, setSpeedPreference] = useState<SpeedPreference>("km/h");
 
 	const [delay, setDelay] = useState<number>(0);
 
@@ -33,10 +38,14 @@ export default function SettingsPage() {
 			setTableHeaders(customSettings.tableHeaders);
 			setSectorFastest(customSettings.sectorFastest);
 			setCarMetrics(customSettings.carMetrics);
+			setShowCornerNumbers(customSettings.showCornerNumbers);
+
+			const speedPreferenceStorage = (localStorage.getItem("speedPreference") as SpeedPreference) ?? "km/h";
+			setSpeedPreference(speedPreferenceStorage);
 		}
 	}, []);
 
-	const handleUpdate = (type: "sector" | "table" | "car", newValue: boolean) => {
+	const handleUpdate = (type: "sector" | "table" | "car" | "corner", newValue: boolean) => {
 		if (typeof window != undefined) {
 			const customStorage = localStorage.getItem("custom");
 			const customSettings: UiElements = customStorage ? JSON.parse(customStorage) : modes.custom;
@@ -54,6 +63,10 @@ export default function SettingsPage() {
 					customSettings.sectorFastest = newValue;
 					break;
 				}
+				case "corner": {
+					customSettings.showCornerNumbers = newValue;
+					break;
+				}
 			}
 
 			localStorage.setItem("custom", JSON.stringify(customSettings));
@@ -65,6 +78,14 @@ export default function SettingsPage() {
 
 		if (typeof window != undefined) {
 			localStorage.setItem("delay", `${newDelay}`);
+		}
+	};
+
+	const updateSpeedPreference = (newSpeedPreference: SpeedPreference) => {
+		setSpeedPreference(newSpeedPreference);
+
+		if (typeof window != undefined) {
+			localStorage.setItem("speedPreference", newSpeedPreference);
 		}
 	};
 
@@ -120,6 +141,17 @@ export default function SettingsPage() {
 				<p className="text-zinc-500">Show Car Metrics (RPM, Gear, Speed)</p>
 			</div>
 
+			<div className="flex gap-2">
+				<Toggle
+					enabled={showCornerNumbers}
+					setEnabled={(v) => {
+						setShowCornerNumbers(v);
+						handleUpdate("corner", v);
+					}}
+				/>
+				<p className="text-zinc-500">Show Corner Numbers on Track Map</p>
+			</div>
+
 			<h2 className="my-4 text-2xl">Delay</h2>
 
 			<p className="mb-4">
@@ -136,6 +168,20 @@ export default function SettingsPage() {
 			<Button className="mt-2 !bg-red-500" onClick={() => updateDelay(0)}>
 				Reset delay
 			</Button>
+
+			<h2 className="my-4 text-2xl">Speed Metric</h2>
+
+			<p className="mb-4">Choose the unit in which you want to display speeds.</p>
+
+			<SegmentedControls
+				id="speed"
+				selected={speedPreference}
+				options={[
+					{ label: "km/h", value: "km/h" },
+					{ label: "mp/h", value: "mp/h" },
+				]}
+				onSelect={updateSpeedPreference}
+			/>
 
 			{/* <h2 className="my-4 text-2xl">Walkthrough</h2>
 
