@@ -26,7 +26,7 @@ type Props = {
 	drivers: DriverList | undefined;
 	timingDrivers: TimingData | undefined;
 	positions: Positions | null;
-
+	year: number;
 	trackStatus: TrackStatus | undefined;
 	raceControlMessages: RaceControlMessage[] | undefined;
 };
@@ -162,6 +162,7 @@ type Corner = {
 
 export default function Map({
 	circuitKey,
+	year,
 	drivers,
 	timingDrivers,
 	trackStatus,
@@ -183,7 +184,7 @@ export default function Map({
 	useEffect(() => {
 		(async () => {
 			if (!circuitKey) return;
-			const mapJson = await fetchMap(circuitKey);
+			const mapJson = await fetchMap(circuitKey, year);
 
 			const centerX = (Math.max(...mapJson.x) - Math.min(...mapJson.x)) / 2;
 			const centerY = (Math.max(...mapJson.y) - Math.min(...mapJson.y)) / 2;
