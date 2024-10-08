@@ -26,7 +26,7 @@ type Props = {
 	drivers: DriverList | undefined;
 	timingDrivers: TimingData | undefined;
 	positions: Positions | null;
-	year: number;
+	year: number | undefined;
 	trackStatus: TrackStatus | undefined;
 	raceControlMessages: RaceControlMessage[] | undefined;
 };

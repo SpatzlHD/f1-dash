@@ -3,6 +3,7 @@ use tokio::net::TcpListener;
 use tracing::info;
 use tracing::level_filters::LevelFilter;
 
+
 use env;
 
 mod endpoints {
@@ -16,11 +17,14 @@ async fn main() {
     env::init();
     init_logs();
 
+    
+
     let app = Router::new()
         .route("/api/schedule", get(endpoints::schedule::get))
         .route("/api/schedule/next", get(endpoints::schedule::get_next))
         .route("/api/health", get(endpoints::health::check))
         .route("/api/proxy/:url", get(endpoints::proxy::get));
+       
 
     let addr = addr();
 
